@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { NavLink } from "react-router-dom";
 import { useProfile } from "@/context/ProfileContext";
 import resumeService from "@/services/resumeService";
@@ -8,6 +8,7 @@ const Navbar = () => {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [resumeUrl, setResumeUrl] = useState(null);
+  const [resumeFetching, setResumeFetching] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
@@ -15,7 +16,6 @@ const Navbar = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Lock body scroll when mobile menu is open
   useEffect(() => {
     document.body.style.overflow = menuOpen ? "hidden" : "";
     return () => {
@@ -23,11 +23,18 @@ const Navbar = () => {
     };
   }, [menuOpen]);
 
-  useEffect(() => {
+  const handleResumeClick = useCallback((e) => {
+    if (resumeUrl) return;
+    e.preventDefault();
+    if (resumeFetching) return;
+    setResumeFetching(true);
     resumeService.getResume().then((data) => {
-      if (data?.resume?.resumeUrl) setResumeUrl(data.resume.resumeUrl);
-    }).catch(() => {});
-  }, []);
+      if (data?.resume?.resumeUrl) {
+        setResumeUrl(data.resume.resumeUrl);
+        window.open(data.resume.resumeUrl, "_blank", "noopener");
+      }
+    }).catch(() => {}).finally(() => setResumeFetching(false));
+  }, [resumeUrl, resumeFetching]);
 
   const navLinks = [
     { label: "Home", to: "/" },
@@ -137,45 +144,38 @@ const Navbar = () => {
             </div>
 
             {/* Resume CTA */}
-            {resumeUrl ? (
-              <a
-                href={resumeUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="relative inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold
-                  text-white bg-gradient-to-r from-blue-600 to-violet-600
-                  hover:from-blue-500 hover:to-violet-500
-                  shadow-[0_0_20px_rgba(99,102,241,0.3)] hover:shadow-[0_0_28px_rgba(99,102,241,0.55)]
-                  transition-all duration-300 group overflow-hidden"
-              >
-                <span
-                  className="absolute inset-0 -translate-x-full group-hover:translate-x-full
-                  bg-gradient-to-r from-transparent via-white/10 to-transparent
-                  transition-transform duration-700 skew-x-12"
-                />
-                <svg
-                  className="w-4 h-4"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                  />
-                </svg>
-                Resume
-              </a>
-            ) : (
+            <a
+              href={resumeUrl || "#"}
+              onClick={handleResumeClick}
+              target={resumeUrl ? "_blank" : undefined}
+              rel={resumeUrl ? "noopener noreferrer" : undefined}
+              className={`relative inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold
+                transition-all duration-300 group overflow-hidden
+                ${resumeUrl
+                  ? "text-white bg-gradient-to-r from-blue-600 to-violet-600 hover:from-blue-500 hover:to-violet-500 shadow-[0_0_20px_rgba(99,102,241,0.3)] hover:shadow-[0_0_28px_rgba(99,102,241,0.55)]"
+                  : "text-slate-500 bg-white/[0.03] border border-white/[0.06] hover:bg-white/[0.06]"
+                }`}
+            >
               <span
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold
-                  text-slate-600 bg-white/[0.03] border border-white/[0.06] cursor-not-allowed"
+                className="absolute inset-0 -translate-x-full group-hover:translate-x-full
+                bg-gradient-to-r from-transparent via-white/10 to-transparent
+                transition-transform duration-700 skew-x-12"
+              />
+              <svg
+                className="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
               >
-                Resume unavailable
-              </span>
-            )}
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                />
+              </svg>
+              {resumeFetching ? "Loading..." : "Resume"}
+            </a>
           </div>
 
           {/* Hamburger */}
@@ -282,43 +282,33 @@ const Navbar = () => {
           </div>
 
           {/* Mobile Resume */}
-          {resumeUrl ? (
-            <a
-              href={resumeUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={() => setMenuOpen(false)}
-              className="mt-4 flex items-center justify-center gap-2 px-4 py-3 rounded-xl
-                text-white font-semibold text-sm
-                bg-gradient-to-r from-blue-600 to-violet-600
-                hover:from-blue-500 hover:to-violet-500
-                shadow-[0_0_24px_rgba(99,102,241,0.3)]
-                transition-all duration-300"
+          <a
+            href={resumeUrl || "#"}
+            onClick={(e) => { setMenuOpen(false); handleResumeClick(e); }}
+            target={resumeUrl ? "_blank" : undefined}
+            rel={resumeUrl ? "noopener noreferrer" : undefined}
+            className={`mt-4 flex items-center justify-center gap-2 px-4 py-3 rounded-xl
+              font-semibold text-sm transition-all duration-300
+              ${resumeUrl
+                ? "text-white bg-gradient-to-r from-blue-600 to-violet-600 hover:from-blue-500 hover:to-violet-500 shadow-[0_0_24px_rgba(99,102,241,0.3)]"
+                : "text-slate-500 bg-white/[0.03] border border-white/[0.06] hover:bg-white/[0.06]"
+              }`}
+          >
+            <svg
+              className="w-4 h-4"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
             >
-              <svg
-                className="w-4 h-4"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                />
-              </svg>
-              Download Resume
-            </a>
-          ) : (
-            <span
-              className="mt-4 flex items-center justify-center gap-2 px-4 py-3 rounded-xl
-                text-slate-600 font-semibold text-sm
-                bg-white/[0.03] border border-white/[0.06] cursor-not-allowed"
-            >
-              Resume unavailable
-            </span>
-          )}
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+              />
+            </svg>
+            {resumeFetching ? "Loading..." : "Download Resume"}
+          </a>
 
           {/* Bottom tagline */}
           <p className="mt-auto text-xs text-slate-600 text-center">
