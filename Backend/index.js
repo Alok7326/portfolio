@@ -52,6 +52,7 @@ const allowedOrigins = process.env.ALLOWED_ORIGINS
       "http://localhost:3000",
       "http://127.0.0.1:5173",
       "https://alok-portfolio-7di6.onrender.com",
+      "https://portfolio-frontend-2s15.onrender.com",
     ];
 
 app.use(
@@ -60,9 +61,7 @@ app.use(
       if (!origin || allowedOrigins.includes(origin)) {
         callback(null, true);
       } else {
-        const err = new Error("Not allowed by CORS");
-        err.statusCode = 403;
-        callback(err);
+        callback(null, false);
       }
     },
     credentials: true,

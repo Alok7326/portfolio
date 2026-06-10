@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import useInView from "../../hooks/useInView";
 import { useProfile } from "@/context/ProfileContext";
+import resumeService from "@/services/resumeService";
 import educationService from "@/services/educationService";
 import experienceService from "@/services/experienceService";
 import skillService from "@/services/skillService";
@@ -18,6 +19,7 @@ export default function AboutPage() {
   const [eduLoading, setEduLoading] = useState(true);
   const [expLoading, setExpLoading] = useState(true);
   const [expError, setExpError] = useState(null);
+  const [resumeUrl, setResumeUrl] = useState(null);
 
   // Fetch data on mount
   useEffect(() => {
@@ -58,6 +60,9 @@ export default function AboutPage() {
         setExpLoading(false);
       }
     };
+    resumeService.getResume().then((data) => {
+      if (data?.resume?.resumeUrl) setResumeUrl(data.resume.resumeUrl);
+    }).catch(() => {});
     fetchData();
   }, []);
 
@@ -424,12 +429,22 @@ export default function AboutPage() {
             </p>
           </div>
           <div className="flex gap-3">
-            <a
-              href="#"
-              className="px-6 py-3 rounded-xl bg-gradient-to-r from-cyan-500 to-indigo-600 text-white text-sm font-semibold hover:shadow-lg hover:shadow-indigo-500/25 hover:-translate-y-0.5 transition-all duration-300"
-            >
-              Download CV
-            </a>
+            {resumeUrl ? (
+              <a
+                href={resumeUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="px-6 py-3 rounded-xl bg-gradient-to-r from-cyan-500 to-indigo-600 text-white text-sm font-semibold hover:shadow-lg hover:shadow-indigo-500/25 hover:-translate-y-0.5 transition-all duration-300"
+              >
+                Download CV
+              </a>
+            ) : (
+              <span
+                className="px-6 py-3 rounded-xl bg-white/[0.03] border border-white/[0.06] text-slate-600 text-sm font-semibold cursor-not-allowed"
+              >
+                Resume unavailable
+              </span>
+            )}
             <a
               href="/contact"
               className="px-6 py-3 rounded-xl border border-white/[0.10] bg-white/[0.04] text-slate-300 text-sm font-semibold hover:border-white/20 hover:-translate-y-0.5 transition-all duration-300"
