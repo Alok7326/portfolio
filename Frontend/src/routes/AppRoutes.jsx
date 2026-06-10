@@ -1,70 +1,83 @@
+import { lazy, Suspense } from "react";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import MainLayout from "@/layouts/MainLayout";
-import AdminLayout from "@/layouts/AdminLayout";
 import ProtectedRoute from "@/routes/ProtectedRoute";
 
-// Public pages
-import Home from "@/pages/public/HomePage";
-import About from "@/pages/public/AboutPage";
-import Contact from "@/pages/public/ContactPage";
-import Projects from "@/pages/public/ProjectsPage";
-import Certificates from "@/pages/public/CertificatesPage";
-import NotFound from "@/pages/public/NotFound";
+const Home = lazy(() => import("@/pages/public/HomePage"));
+const About = lazy(() => import("@/pages/public/AboutPage"));
+const Contact = lazy(() => import("@/pages/public/ContactPage"));
+const Projects = lazy(() => import("@/pages/public/ProjectsPage"));
+const Certificates = lazy(() => import("@/pages/public/CertificatesPage"));
+const NotFound = lazy(() => import("@/pages/public/NotFound"));
 
-// Admin pages
-import Login from "@/pages/admin/Login";
-import Dashboard from "@/pages/admin/Dashboard";
-import ManageProjects from "@/pages/admin/projects/ManageProjects";
-import AddProject from "@/pages/admin/projects/AddProject";
-import EditProject from "@/pages/admin/projects/EditProject";
-import ManageSkills from "@/pages/admin/skills/ManageSkills";
-import ManageExperience from "@/pages/admin/experience/ManageExperience";
-import ManageEducation from "@/pages/admin/education/ManageEducation";
-import ManageCertificates from "@/pages/admin/certificates/ManageCertificates";
-import ManageResume from "@/pages/admin/resume/ManageResume";
-import ManageProfile from "@/pages/admin/profile/ManageProfile";
-import ContactMessages from "@/pages/admin/messages/ContactMessages";
+const Login = lazy(() => import("@/pages/admin/Login"));
+const AdminLayout = lazy(() => import("@/layouts/AdminLayout"));
+const Dashboard = lazy(() => import("@/pages/admin/Dashboard"));
+const ManageProjects = lazy(() => import("@/pages/admin/projects/ManageProjects"));
+const AddProject = lazy(() => import("@/pages/admin/projects/AddProject"));
+const EditProject = lazy(() => import("@/pages/admin/projects/EditProject"));
+const ManageSkills = lazy(() => import("@/pages/admin/skills/ManageSkills"));
+const ManageExperience = lazy(() => import("@/pages/admin/experience/ManageExperience"));
+const ManageEducation = lazy(() => import("@/pages/admin/education/ManageEducation"));
+const ManageCertificates = lazy(() => import("@/pages/admin/certificates/ManageCertificates"));
+const ManageResume = lazy(() => import("@/pages/admin/resume/ManageResume"));
+const ManageProfile = lazy(() => import("@/pages/admin/profile/ManageProfile"));
+const ContactMessages = lazy(() => import("@/pages/admin/messages/ContactMessages"));
+
+function PageFallback() {
+  return (
+    <div className="min-h-screen bg-[#07070e] flex items-center justify-center">
+      <div className="flex flex-col items-center gap-4">
+        <div className="w-8 h-8 border-2 border-cyan-400 border-t-transparent rounded-full animate-spin" />
+        <p className="text-slate-500 text-sm">Loading...</p>
+      </div>
+    </div>
+  );
+}
+
+function LazyPage({ Component }) {
+  return (
+    <Suspense fallback={<PageFallback />}>
+      <Component />
+    </Suspense>
+  );
+}
 
 const router = createBrowserRouter([
-  // Public routes with MainLayout (Navbar + Footer)
   {
     element: <MainLayout />,
     children: [
-      { path: "/", element: <Home /> },
-      { path: "/about", element: <About /> },
-      { path: "/projects", element: <Projects /> },
-      { path: "/certificates", element: <Certificates /> },
-      { path: "/contact", element: <Contact /> },
-      { path: "*", element: <NotFound /> },
+      { path: "/", element: <LazyPage Component={Home} /> },
+      { path: "/about", element: <LazyPage Component={About} /> },
+      { path: "/projects", element: <LazyPage Component={Projects} /> },
+      { path: "/certificates", element: <LazyPage Component={Certificates} /> },
+      { path: "/contact", element: <LazyPage Component={Contact} /> },
+      { path: "*", element: <LazyPage Component={NotFound} /> },
     ],
   },
-
-  // Admin login (standalone, no layout)
   {
     path: "/admin/login",
-    element: <Login />,
+    element: <LazyPage Component={Login} />,
   },
-
-  // Admin routes (protected, with AdminLayout)
   {
     path: "/admin/dashboard",
     element: (
       <ProtectedRoute>
-        <AdminLayout />
+        <LazyPage Component={AdminLayout} />
       </ProtectedRoute>
     ),
     children: [
-      { path: "", element: <Dashboard /> },
-      { path: "projects", element: <ManageProjects /> },
-      { path: "projects/add", element: <AddProject /> },
-      { path: "projects/edit/:id", element: <EditProject /> },
-      { path: "skills", element: <ManageSkills /> },
-      { path: "experience", element: <ManageExperience /> },
-      { path: "education", element: <ManageEducation /> },
-      { path: "certificates", element: <ManageCertificates /> },
-      { path: "resume", element: <ManageResume /> },
-      { path: "profile", element: <ManageProfile /> },
-      { path: "messages", element: <ContactMessages /> },
+      { path: "", element: <LazyPage Component={Dashboard} /> },
+      { path: "projects", element: <LazyPage Component={ManageProjects} /> },
+      { path: "projects/add", element: <LazyPage Component={AddProject} /> },
+      { path: "projects/edit/:id", element: <LazyPage Component={EditProject} /> },
+      { path: "skills", element: <LazyPage Component={ManageSkills} /> },
+      { path: "experience", element: <LazyPage Component={ManageExperience} /> },
+      { path: "education", element: <LazyPage Component={ManageEducation} /> },
+      { path: "certificates", element: <LazyPage Component={ManageCertificates} /> },
+      { path: "resume", element: <LazyPage Component={ManageResume} /> },
+      { path: "profile", element: <LazyPage Component={ManageProfile} /> },
+      { path: "messages", element: <LazyPage Component={ContactMessages} /> },
     ],
   },
 ]);

@@ -1,4 +1,3 @@
-import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { useProfile } from "@/context/ProfileContext";
 
@@ -101,13 +100,7 @@ const Footer = () => {
 
       <div className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* ── CTA Top Area ── */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          viewport={{ once: true }}
-          className="flex flex-col items-center text-center gap-4 py-16 border-b border-white/6"
-        >
+        <div className="flex flex-col items-center text-center gap-4 py-16 border-b border-white/6">
           <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white leading-tight max-w-xl">
             Let's Build Something{" "}
             <span className="bg-linear-to-r from-blue-400 to-violet-400 bg-clip-text text-transparent">
@@ -118,13 +111,11 @@ const Footer = () => {
             Open to full-time opportunities, freelance projects, and meaningful
             collaborations. Let's turn ideas into impactful products.
           </p>
-          <motion.a
+          <a
             href={profile?.email ? `mailto:${profile.email}` : "#"}
-            whileHover={{ scale: 1.03 }}
-            whileTap={{ scale: 0.97 }}
             className="mt-2 inline-flex items-center gap-2 px-6 py-3 rounded-xl
               bg-linear-to-r from-blue-600 to-violet-600 text-white text-sm font-semibold
-              hover:shadow-[0_0_24px_rgba(99,102,241,0.4)]
+              hover:shadow-[0_0_24px_rgba(99,102,241,0.4)] active:scale-95
               transition-all duration-300 ease-out"
           >
             Get In Touch
@@ -140,19 +131,13 @@ const Footer = () => {
             >
               <path d="M5 12h14M12 5l7 7-7 7" />
             </svg>
-          </motion.a>
-        </motion.div>
+          </a>
+        </div>
 
         {/* ── Middle 3-column Section ── */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-10 py-12">
           {/* Column 1: Brand */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.05 }}
-            viewport={{ once: true }}
-            className="flex flex-col gap-3"
-          >
+          <div className="flex flex-col gap-3">
             <div>
               <h3 className="text-white font-bold text-lg tracking-tight">
                 {loading ? (
@@ -168,16 +153,10 @@ const Footer = () => {
             <p className="text-slate-400 text-sm leading-relaxed">
               Building clean, scalable, and impactful web experiences.
             </p>
-          </motion.div>
+          </div>
 
           {/* Column 2: Quick Links */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.12 }}
-            viewport={{ once: true }}
-            className="flex flex-col gap-3"
-          >
+          <div className="flex flex-col gap-3">
             <p className="text-white text-sm font-semibold tracking-wide">
               Quick Links
             </p>
@@ -194,16 +173,10 @@ const Footer = () => {
                 </li>
               ))}
             </ul>
-          </motion.div>
+          </div>
 
           {/* Column 3: Social Links */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.18 }}
-            viewport={{ once: true }}
-            className="flex flex-col gap-3"
-          >
+          <div className="flex flex-col gap-3">
             <p className="text-white text-sm font-semibold tracking-wide">
               Connect
             </p>
@@ -236,18 +209,12 @@ const Footer = () => {
                 </li>
               ))}
             </ul>
-          </motion.div>
+          </div>
         </div>
 
         {/* ── Bottom Bar ── */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          transition={{ duration: 0.6, delay: 0.2 }}
-          viewport={{ once: true }}
-          className="flex flex-col sm:flex-row items-center justify-between
-            gap-3 py-6 border-t border-white/6"
-        >
+        <div className="flex flex-col sm:flex-row items-center justify-between
+            gap-3 py-6 border-t border-white/6">
           <p className="text-slate-500 text-xs">
             © {new Date().getFullYear()} {profile?.name || ""}. All rights reserved.
           </p>
@@ -255,7 +222,7 @@ const Footer = () => {
             Designed &amp; Built by{" "}
             <span className="text-slate-400">{profile?.name || ""}</span>
           </p>
-        </motion.div>
+        </div>
       </div>
     </footer>
   );

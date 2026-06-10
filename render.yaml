@@ -1,11 +1,13 @@
 services:
-  - type: static
+  - type: web
     name: portfolio-frontend
+    runtime: node
     repo: https://github.com/your-username/your-repo
     buildCommand: cd Frontend && npm install && npm run build
-    publishDir: Frontend/dist
-    staticPublishPath: Frontend/dist
-    routes:
-      - type: rewrite
-        source: /*
-        destination: /index.html
+    startCommand: cd Frontend && npm start
+    healthCheckPath: /
+    envVars:
+      - key: NODE_VERSION
+        value: 20
+      - key: PORT
+        value: 3000
